@@ -1,0 +1,822 @@
+<!doctype html>
+<html>
+<head>
+<template source='TPL:common.head' load='true' />
+<link rel="stylesheet" type="text/css" href="{@G:design.url.css}/115lacss/style_9_common.css" />
+<link rel="stylesheet" type="text/css" href="{@G:design.url.css}/115lacss/style_9_portal_index.css" />
+<script src="{@G:design.url.js}/common.js" type="text/javascript"></script>
+<style>
+.forum_recommend{
+    background:#fff;
+	padding:12px 12px 12px;
+}
+
+.forum_recommend .home_push_slide{
+	float:left;
+}
+.home_push_slidewrap{
+	float:left;
+	width: 300px;
+	display:inline;
+	height:346px;
+}
+.home_push_slide {
+	height: 346px;
+	overflow: hidden;
+	position: relative;
+	width: 300px;
+	background:#f5f5f5;
+}
+.home_push_slide img{
+	display: block;
+}
+.home_push_slide .num {
+	bottom:5px;
+	right: 5px;
+	position: absolute;
+	z-index:6;
+}
+.home_push_slide .num li {
+	float: left;
+	margin-left: 5px;
+}
+.home_push_slide .num li a {
+	background:#fff;
+	color: #000;
+	padding:0 5px;
+}
+.home_push_slide .num li a:hover,
+.home_push_slide .num li.current a {
+	background: #f60;
+	color: #fff;
+	text-decoration: none;
+}
+.home_push_slide .caption {
+	background:#000;
+	background:rgba(0,0,0,.5);
+	bottom:0px;
+	height:30px;
+	position: absolute;
+	width: 100%;
+	z-index: 6;
+}
+.home_push_slide .caption p {
+	color: #fff;
+	height: 30px;
+	line-height: 30px;
+	text-indent: 10px;
+	width: 100%;
+}
+.home_push_slide .caption .h2 {
+	height: 30px;
+	line-height: 30px;
+	overflow:hidden;
+	text-indent: 10px;
+}
+.home_push_slide .caption .h2 a {
+	color: #fff;
+	font-size: 12px;
+}
+</style>
+</head>
+<body id="nv_portal" class="pg_index" onkeydown="if(event.keyCode==27) return false;">
+<pw-start/>
+	<div class="wrap">
+	<pw-head/>
+<div id="append_parent"></div><div id="ajaxwaitid"></div>
+<div id="toptb" class="cl">
+<div class="wp">
+<div class="z"><a href="javascript:;"  onclick="setHomepage('{@url:}');">设为首页</a><a href="{@url:}"  onclick="addFavorite(this.href, '{@G:seo.title}');return false;">收藏本站</a></div>
+<div class="y">
+<!--# if (!$loginUser->isExists()) { #-->
+<div>
+	<hook name="header_info_3"/><a rel="nofollow" href="{@url:u/login/run}"><span>[登录</span></a><a rel="nofollow" href="{@url:u/register/run}"><span>注册]</span></a>
+</div>
+<!--# } else {
+	if ($pwforum && $pwforum->isForum()) {
+		$_tmpfid = $pwforum->fid;
+		$_tmpcid = $pwforum->getCateId();
+	} else {
+		$_tmpfid = 0;
+		$_tmpcid = $pwforum ? $pwforum->getCateId() : '0';
+	}
+#-->
+
+	
+	<!--#
+		$messageCount = $loginUser->info['notices'] + $loginUser->info['messages'];
+		$messageClass = $messageCount ? 'header_message' : 'header_message header_message_none';
+	#-->
+	<a class="y" tabindex="0" href="{@url:message/message/run}" aria-haspopup="J_head_msg_pop" aria-label="消息菜单,按pagedown打开菜单,tab键导航,esc键关闭"><span class="inside"><span>消息<em class="core_num J_hm_num">{$messageCount}</em></span></span></a>
+	<!--消息下拉菜单-->
+	<div id="J_head_msg_pop" tabindex="0" aria-label="消息下拉菜单,按ESC键关闭菜单" class="header_menu_wrap my_message_menu" style="display:none;">
+		<div class="header_menu cc">
+			<div class="header_menu_hd" id="J_head_pl_hm"><span class="{$messageClass} header_message_down">消息<em class="core_num J_hm_num">{$messageCount}</em></span></div>
+			<div id="J_head_msg" class="my_message_content"><div class="pop_loading"></div></div>
+		</div>
+	</div>
+	<div class="y">
+		<hook name="header_info_1"/>
+		<a aria-haspopup="J_head_user_menu" aria-label="个人功能菜单,按pagedown打开菜单,tab键导航,esc键关闭" tabindex="0" rel="nofollow" href="{@url:space/index/run?uid=$loginUser->uid}" id="J_head_user_a" class="username" title="{$loginUser->username}">{@Pw::substrs($loginUser->username,6)}<em class="core_arrow"></em></a>
+		<hook name="header_info_2"/>
+		<div class="fl">
+		<div id="J_head_user_menu" role="menu" class="header_menu_wrap my_menu_wrap" style="display:none;">
+			<div class="header_menu my_menu cc">
+				<div class="header_menu_hd" id="J_head_pl_user"><span title="{$loginUser->username}" class="username">{@Pw::substrs($loginUser->username,6)}</span><em class="core_arrow_up"></em></div>
+				<ul class="ct cc">
+				<!--# $nav = Wekit::load('SRV:nav.bo.PwNavBo');
+					$myNav = $nav->getNavFromConfig('my');
+					foreach($myNav as $key=>$value){
+				#-->
+					<li>{$value['name']|html}</li>
+				<!--# } #-->
+				<!--#
+				$_url = '';
+				$_panelManage = false;
+
+				// $_toCheck: permission name => array(permission key, url path)
+				$_toCheck = array(
+					'panel_bbs_manage'     => array('thread_check', 'manage/content/run'),
+					'panel_user_manage'    => array('user_check', 'manage/user/run'),
+					'panel_report_manage'  => array('report_manage', 'manage/report/run'),
+					'panel_recycle_manage' => array('recycle', 'manage/recycle/run'),
+				);
+				foreach ($_toCheck as $_permName => $_permInfo) {
+					if ($_panelManage) {
+						break;
+					}
+					$_permission  = $loginUser->getPermission($_permName, false, array());
+					if ($_permission && isset($_permission[$_permInfo[0]])) {
+						$_url = $_permInfo[1];
+						$_panelManage = true;
+					}
+				}
+				if ($_panelManage) {
+				#-->
+					<li><a href="{@WindUrlHelper::createUrl($_url)|url}" rel="nofollow"><em class="icon_system"></em>前台管理</a></li>
+				<!--#} if (Pw::getstatus($loginUser->info['status'], PwUser::STATUS_ALLOW_LOGIN_ADMIN) || Pw::inArray(3, $loginUser->groups)) {#-->
+					<li><a href="{@Wind::getComponent('router')->getRoute('pw')->checkUrl('admin.php')}" target="_blank" rel="nofollow"><em class="icon_admin"></em>系统后台</a></li>
+				<!--# } #-->
+				</ul>
+				<ul class="ft cc">
+					<li><a href="{@url:profile/index/run}"><em class="icon_profile"></em>个人设置</a></li>
+					<hook name="header_my" />
+					<li><a href="{@url:u/login/logout}" rel="nofollow"><em class="icon_quit"></em>退出</a></li>
+				</ul>
+			</div>
+		</div>
+		</div>
+	</div>
+	<!--# if ($loginUser->info['message_tone'] > 0 && $messageCount > 0) { #-->
+	<audio autoplay="autoplay">
+		<source src="{@theme:images}/message/msg.wav" type="audio/wav" />
+		<source src="{@theme:images}/message/msg.mp3" type="audio/mp3" />
+		<div style='overflow:hidden;width:0;float:left'><embed src='{@theme:images}/message/msg.wav' width='0' height='0' AutoStart='true' type='application/x-mplayer2'></embed></div>
+	</audio>
+	<!--# } #-->
+<!--# } #-->
+</div>
+</div>
+</div>
+<div id="qmenu_menu" class="p_pop blk" style="display: none;">
+<div id="fjump_menu" class="btda"></div></div><div id="hd">
+<div class="wp">
+
+<div class="hdc cl"><h2><pw-title><a href="../." title="{@G:seo.title}"><img src="{@G:design.url.images}/logo.png" alt="{@G:seo.title}" width="200" height="65" border="0" /></a></pw-title></h2>
+
+<div style="width:738px; height:68px; float:left; font-size:12px;">
+  <table width="738" height="68" border="0" cellpadding="0" cellspacing="0">
+    
+    
+    <tr>
+      <td width="477"><div align="center">
+        <pw-list>欢迎来到我的网站！</pw-list>
+      </div></td>
+      <td width="261"><div align="center"><pw-list><img src="{@G:design.url.images}/banner01.png" width="256" height="65"></pw-list>
+      </div></td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+
+
+</div>
+<div id="nv">
+<a href="{@url:}index.php?m=bbs&c=forumlist" target="_blank" id="qmenu" onMouseOver="delayShow(this, function () {showMenu({'ctrlid':'qmenu','pos':'34!','ctrlclass':'a','duration':2});showForummenu(0);})">版块导航</a>
+
+<ul><li class="a" id="mn_portal" ><a href="{@url:}" hidefocus="true" title="Portal"  >首页<span>网站首页</span></a></li>
+
+<!--# $nav = Wekit::load('SRV:nav.bo.PwNavBo');
+		  $nav->setRouter();
+		  $currentId =  '';
+		   $main = $child = array();
+		  if ($nav->isForum()) $nav->setForum($pwforum->foruminfo['parentid'], $fid, $tid);
+		  $main = $nav->getNavFromConfig('main', true);
+		  foreach($main as $key=>$value){
+			if ($value['current']) {
+				$current = 'current';
+				$currentId = $key;
+			} else {
+				$current = '';
+			}
+			$value['child'] && $child[$key] = $value['child'];
+		  #-->
+					<li id="mn_P2" class="{$current}" hidefocus="true">{$value['name']|html}</li>
+	<!--# } #-->
+
+
+</ul>
+</div>
+<div class="p_pop h_pop" id="mn_userapp_menu" style="display: none"></div><div id="mu" class="cl">
+</div>
+<div class="comiis_nav">
+   <dt class="nav_ico01"><pw-list>
+<li><A href="#" target=_blank>休闲灌水</A></li>
+<li><A href="#" target=_blank>娱乐八卦</A></li>
+<li><A href="#" target=_blank>吃喝玩乐</A></li>
+<li><A href="#" target=_blank>新闻中心</A></li>
+<li><A href="#" target=_blank>时尚节拍</A></li>
+<li><A href="#" target=_blank>开心贴图</A></li></pw-list>
+   </dt>
+   <dt class="nav_ico02"><pw-list>
+<li><A href="#" target=_blank>音乐视听</A></li>
+<li><A href="#" target=_blank>旅游休闲</A></li>
+<li><A href="#" target=_blank>美女图库</A></li>
+<li><A href="#" target=_blank>情感沙龙</A></li>
+<li><A href="#" target=_blank>亲子乐园</A></li>
+<li><A href="#" target=_blank>女人世界</A></li></pw-list>
+   </dt>
+   <dt class="nav_ico03"><pw-list>
+<li><A href="#" target=_blank>房产家居</A></li>
+<li><A href="#" target=_blank>人才招聘</A></li>
+<li><A href="#" target=_blank>城市信息</A></li>
+<li><A href="#" target=_blank>健康生活</A></li>
+<li><A href="#" target=_blank>职场交流</A></li>
+<li><A href="#" target=_blank>投资理财</A></li></pw-list>
+   </dt>
+   <dt class="nav_ico04" style="width:130px;"><pw-list>
+<li><A href="#" target=_blank>新手报道</A></li>
+<li><A href="#" target=_blank>网友中心</A></li>
+<li><A href="#" target=_blank>社区公告</A></li>
+<li><A href="#" target=_blank>我的板块</A></li></pw-list>
+   </dt>
+</DIV> 
+<div style="clear:both;"></div><div id="scbar" class="scbar_narrow cl">
+<form id="scbar_form" method="post" autocomplete="off" onSubmit="searchFocus($('comiis_twtsc_txt'))" action="../index.php?m=search&c=s" target="_blank">
+<input type="hidden" name="keyword" id="comiis_twtsc_mod" value="search" />
+<table cellspacing="0" cellpadding="0">
+<tr>
+<td class="scbar_icon_td"></td>
+<td class="scbar_txt_td"><input type="text" name="keyword" id="scbar_txt"  autocomplete="off" x-webkit-speech speech /></td>
+<td class="scbar_type_td"><a href="javascript:;" id="scbar_type" class="xg1" onClick="showMenu(this.id)" hidefocus="true">帖子</a></td>
+<td class="scbar_btn_td"><button type="submit" name="searchsubmit" id="scbar_btn" sc="1" class="pn pnc" value="true"><strong class="xi2">搜索</strong></button></td>
+<td class="scbar_hot_td">
+<div id="scbar_hot">
+<strong class="xw1">热搜: </strong>
+<pw-title>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a>
+<a href="../index.php?m=app&a=run&keywords=热搜词&app=search" target="_blank" class="xi2" sc="1">热搜词</a></pw-title>
+
+</div>
+</td>
+</tr>
+</table>
+</form>
+</div>
+<script type="text/javascript">
+initSearchmenu('scbar', '');
+</script>
+</div>
+</div>
+<div id="wp" class="wp">
+<style id="diy_style" type="text/css">#portal_block_205 .dxb_bc {  margin-top:8px !important;margin-right:8px !important;margin-bottom:8px !important;margin-left:10px !important;}#framehXCsMp {  margin:0px !important;}</style>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh00" class="area"></div><!--[/diy]-->
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh01" class="area"><div id="frameMwBSD0" class="cl_frame_bm frame move-span cl frame-1"><div id="frameMwBSD0_left" class="column frame-1-c"><div id="frameMwBSD0_left_temp" class="move-span temp"></div><div id="portal_block_173" class="cl_block_bm block move-span"><div id="portal_block_173_content" class="dxb_bc"><div class="portal_block_summary"><div class="comiis_dfmh_bananer"><pw-list><a href="#" target="_blank"><img src="{@G:design.url.images}/dfmh_ad08.jpg" width="958" height="50"></a></pw-list>
+</div>
+<div class="comiis_dfmh_bananer"><pw-list><a href="#" target="_blank"><img src="{@G:design.url.images}/dfmh_ad09.jpg" width="958" height="80"></a></pw-list>
+</div></div></div></div></div></div></div><!--[/diy]-->
+<div class="clearfix comiis_dfmh_w960">
+
+
+
+
+<div class="comiis_dfmh_w300">
+<div class="comiis_dfmh_border comiis_dfmh_imgone">	
+<div>
+
+<div id="J_slides" class="home_push_slide">
+<pw-list id="1125">
+	<div class="slides_container">
+		<for:>
+		 <div class="slide">
+			 <a href="{url}" title="" target="_blank"><img src="{thumb|360|240}" width="300" height="346" alt="{title}"></a>
+				<div class="caption">
+					<div class="h2"><a href="{url}" target="_blank">{title|18}</a></div>
+				</div>
+		</div>
+		</for>
+	</div>
+	<ul class="J_slides_num num">
+	<for:>
+		<li><a href="">{$__k+1}</a></li>
+	</for>
+	</ul>
+</pw-list>
+</div>
+
+</div>
+<div id="comiis_x3dfmh02" class="area">
+<div id="frameeBMZM9" class="cl_frame_bm frame move-span cl frame-1">
+<div id="frameeBMZM9_left" class="column frame-1-c">
+<div id="frameeBMZM9_left_temp" class="move-span temp"></div>
+
+
+<div id="portal_block_174" class="cl_block_bm block move-span"><div id="portal_block_174_content" class="dxb_bc">
+<div class="module cl slidebox">
+</div>
+
+<script type="text/javascript">
+runslideshow();
+</script></div></div></div></div></div><!--[/diy]--></div>
+
+
+
+
+<div class="comiis_dfmh_border comiis_dfmh_h246">
+<div class="comiis_dfmh_titone"><h2><em>城市</em>热点</h2></div>
+<div class="comiis_dfmh_w278">
+<div id="comiis_x3dfmh03" class="area"><div id="framedat71d" class="cl_frame_bm frame move-span cl frame-1"><div id="framedat71d_left" class="column frame-1-c"><div id="framedat71d_left_temp" class="move-span temp"></div><div id="portal_block_175" class="cl_block_bm block move-span"><div id="portal_block_175_content" class="dxb_bc">
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="95" height="69" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div></div></div></div><!--[/diy]-->
+<div class="clearfix comiis_dfmh_itemsone">
+<div id="comiis_x3dfmh04" class="area"><div id="framejAXa3b" class="cl_frame_bm frame move-span cl frame-1"><div id="framejAXa3b_left" class="column frame-1-c"><div id="framejAXa3b_left_temp" class="move-span temp"></div><div id="portal_block_176" class="cl_block_bm block move-span"><div id="portal_block_176_content" class="dxb_bc"><ul>
+
+<pw-list><for:><li><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul>
+
+</div></div></div></div></div><!--[/diy]-->
+</div>		
+</div>
+</div>
+</div>
+<div class="comiis_dfmh_w420">
+<div class="comiis_dfmh_tittwo">
+<h2>今日热点<span>FOCUS</span></h2>
+<span class="comiis_dfmh_time"><script type="text/javascript">var d = new Date();document.write(d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日'+' &nbsp;&nbsp;星期'+'日一二三四五六'.charAt(new Date().getDay()));</script></span>
+</div>
+<div id="comiis_x3dfmh05" class="area"><div id="frameEdTYEo" class="cl_frame_bm frame move-span cl frame-1"><div id="frameEdTYEo_left" class="column frame-1-c"><div id="frameEdTYEo_left_temp" class="move-span temp"></div><div id="portal_block_177" class="cl_block_bm block move-span"><div id="portal_block_177_content" class="dxb_bc"><div class="comiis_dfmh_wrapone">
+
+<pw-list><for:>
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">>>全文</a></p></for></pw-list>
+
+
+</div></div></div><div id="portal_block_178" class="cl_block_bm block move-span"><div id="portal_block_178_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul>
+</div>
+<div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+<div class="comiis_dfmh_w220">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh06" class="area"><div id="frameyDyv5U" class="cl_frame_bm frame move-span cl frame-1"><div id="frameyDyv5U_left" class="column frame-1-c"><div id="frameyDyv5U_left_temp" class="move-span temp"></div><div id="portal_block_180" class="cl_block_bm block move-span"><div id="portal_block_180_content" class="dxb_bc"><div class="portal_block_summary"><div class="comiis_dfmh_border comiis_dfmh_imgtwo"><pw-list><img src="{@G:design.url.images}/dfmh_ad03.jpg"></pw-list></div></div></div></div></div></div></div><!--[/diy]-->
+<div class="comiis_dfmh_border comiis_dfmh_h302">
+<div class="comiis_dfmh_titone comiis_dfmh_fottwo"><h2><em>图文</em>推荐</h2></div>
+<div class="comiis_dfmh_w198">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh07" class="area"><div id="frameYkUAPK" class="cl_frame_bm frame move-span cl frame-1"><div id="frameYkUAPK_left" class="column frame-1-c"><div id="frameYkUAPK_left_temp" class="move-span temp"></div><div id="portal_block_181" class="cl_block_bm block move-span"><div id="portal_block_181_content" class="dxb_bc">
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="83" height="70" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div></div></for></pw-list>
+
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh08" class="area"><div id="framey3fR3b" class="cl_frame_bm frame move-span cl frame-1"><div id="framey3fR3b_left" class="column frame-1-c"><div id="framey3fR3b_left_temp" class="move-span temp"></div><div id="portal_block_182" class="cl_block_bm block move-span"><div id="portal_block_182_content" class="dxb_bc"><div class="portal_block_summary"><div class="comiis_dfmh_border comiis_dfmh_imgthree"><pw-list><img src="{@G:design.url.images}/dfmh_ad13.jpg"></pw-list></div></div></div></div></div></div></div><!--[/diy]-->
+<div class="comiis_dfmh_border comiis_dfmh_itemsthree">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh09" class="area"><div id="frameFqtXtT" class="cl_frame_bm frame move-span cl frame-1"><div id="frameFqtXtT_left" class="column frame-1-c"><div id="frameFqtXtT_left_temp" class="move-span temp"></div><div id="portal_block_183" class="cl_block_bm block move-span"><div id="portal_block_183_content" class="dxb_bc"><div class="portal_block_summary"><ul><pw-title>
+<li><a href="#" style="color:#326698">自定义推荐文字广告招租 50元/月</a></li>
+<li><a href="#" style="color:#FE0002">自定义推荐文字广告招租 50元/月</a></li>
+<li><a href="#" style="color:#008001">自定义推荐文字广告招租 50元/月</a></li>
+<li><a href="#" style="color:#FF6500">自定义推荐文字广告招租 50元/月</a></li></pw-title>
+</ul></div></div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+</div>
+<div class="comiis_dfmh_w956">
+<div class="comiis_dfmh_titone comiis_dfmh_fotthree">
+<h2><pw-title><em>有图</em>有真相</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_imgsone">
+<!--[diy=comiis_x3dfmh10]--><div id="comiis_x3dfmh10" class="area"><div id="frameAZ8ApF" class="cl_frame_bm frame move-span cl frame-1"><div id="frameAZ8ApF_left" class="column frame-1-c"><div id="frameAZ8ApF_left_temp" class="move-span temp"></div>
+
+<div id="portal_block_184" class="cl_block_bm block move-span">
+
+<div id="portal_block_184_content" class="dxb_bc">
+
+<pw-list><for:><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="168" height="110" alt="{title}" />{title}</a></for></pw-list>
+
+
+
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh11" class="area"><div id="frameKB6Tob" class="cl_frame_bm frame move-span cl frame-1"><div id="frameKB6Tob_left" class="column frame-1-c"><div id="frameKB6Tob_left_temp" class="move-span temp"></div><div id="portal_block_187" class="cl_block_bm block move-span"><div id="portal_block_187_content" class="dxb_bc"><div class="portal_block_summary"><div class="comiis_dfmh_bananer"><pw-list><a href="#" target="_blank"><img src="{@G:design.url.images}/ad01.png" width="958" height="70"></a></pw-list>
+</div></div></div></div></div></div></div><!--[/diy]-->
+<div class="comiis_dfmh_w960">
+<div class="comiis_dfmh_border comiis_dfmh_w471l">
+<div class="comiis_dfmh_titone comiis_dfmh_fotfour">
+<h2><pw-title><em>美食</em>特工</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh12" class="area"><div id="frameejmoMR" class="cl_frame_bm frame move-span cl frame-1"><div id="frameejmoMR_left" class="column frame-1-c"><div id="frameejmoMR_left_temp" class="move-span temp"></div><div id="portal_block_188" class="cl_block_bm block move-span"><div id="portal_block_188_content" class="dxb_bc">
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+</div></div><div id="portal_block_189" class="cl_block_bm block move-span"><div id="portal_block_189_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+<div class="comiis_dfmh_border comiis_dfmh_w471r">
+<div class="comiis_dfmh_titone comiis_dfmh_fotfive">
+<h2><pw-title><em>兴趣</em>频道</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh13" class="area"><div id="framejnaAKw" class="cl_frame_bm frame move-span cl frame-1"><div id="framejnaAKw_left" class="column frame-1-c"><div id="framejnaAKw_left_temp" class="move-span temp"></div><div id="portal_block_197" class="cl_block_bm block move-span"><div id="portal_block_197_content" class="dxb_bc">
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div><div id="portal_block_190" class="cl_block_bm block move-span"><div id="portal_block_190_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+</div>
+<div class="comiis_dfmh_w960">
+<div class="comiis_dfmh_border comiis_dfmh_w471l">
+<div class="comiis_dfmh_titone comiis_dfmh_Blue">
+<h2><pw-title><em>娱乐</em>休闲</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh14" class="area"><div id="frameCrNDNN" class="cl_frame_bm frame move-span cl frame-1"><div id="frameCrNDNN_left" class="column frame-1-c"><div id="frameCrNDNN_left_temp" class="move-span temp"></div><div id="portal_block_198" class="cl_block_bm block move-span"><div id="portal_block_198_content" class="dxb_bc">
+
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div><div id="portal_block_191" class="cl_block_bm block move-span"><div id="portal_block_191_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->	
+</div>
+</div>
+<div class="comiis_dfmh_border comiis_dfmh_w471r">
+<div class="comiis_dfmh_titone comiis_dfmh_purple">
+<h2><pw-title><em>时尚</em>生活</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh15" class="area"><div id="frameJ0III6" class="cl_frame_bm frame move-span cl frame-1"><div id="frameJ0III6_left" class="column frame-1-c"><div id="frameJ0III6_left_temp" class="move-span temp"></div><div id="portal_block_199" class="cl_block_bm block move-span"><div id="portal_block_199_content" class="dxb_bc">
+
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+</div></div><div id="portal_block_192" class="cl_block_bm block move-span"><div id="portal_block_192_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+</div>
+<div class="comiis_dfmh_w960ad"><!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh16" class="area"><div id="frameu46rIF" class="cl_frame_bm frame move-span cl frame-1"><div id="frameu46rIF_left" class="column frame-1-c"><div id="frameu46rIF_left_temp" class="move-span temp"></div><div id="portal_block_186" class="cl_block_bm block move-span"><div id="portal_block_186_content" class="dxb_bc"><div class="portal_block_summary"><pw-list>
+<a href="#" target="_blank"><img src="{@G:design.url.images}/dfmh_ad10.jpg" style="float:left;"></a>
+<a href="#" target="_blank"><img src="{@G:design.url.images}/dfmh_ad11.jpg" style="float:right;"></a></pw-list>
+</div></div></div></div></div></div><!--[/diy]--></div>
+<div class="comiis_dfmh_w960">
+<div class="comiis_dfmh_border comiis_dfmh_w471l">
+<div class="comiis_dfmh_titone comiis_dfmh_green">
+<h2><pw-title><em>旅游</em>资讯</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh17" class="area"><div id="frameIQd0Qj" class="cl_frame_bm frame move-span cl frame-1"><div id="frameIQd0Qj_left" class="column frame-1-c"><div id="frameIQd0Qj_left_temp" class="move-span temp"></div><div id="portal_block_200" class="cl_block_bm block move-span"><div id="portal_block_200_content" class="dxb_bc">
+
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div><div id="portal_block_193" class="cl_block_bm block move-span"><div id="portal_block_193_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+<div class="comiis_dfmh_border comiis_dfmh_w471r">
+<div class="comiis_dfmh_titone comiis_dfmh_oxfordblue">
+<h2><pw-title><em>车迷</em>互动</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh18" class="area"><div id="frameYnv5aw" class="cl_frame_bm frame move-span cl frame-1"><div id="frameYnv5aw_left" class="column frame-1-c"><div id="frameYnv5aw_left_temp" class="move-span temp"></div><div id="portal_block_201" class="cl_block_bm block move-span"><div id="portal_block_201_content" class="dxb_bc">
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div><div id="portal_block_194" class="cl_block_bm block move-span"><div id="portal_block_194_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->			
+</div>
+</div>
+</div>
+<div class="comiis_dfmh_w960">
+<div class="comiis_dfmh_border comiis_dfmh_w471l">
+<div class="comiis_dfmh_titone comiis_dfmh_carnation">
+<h2><pw-title><em>亲子</em>乐园</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh19" class="area"><div id="frameNq23uG" class="cl_frame_bm frame move-span cl frame-1"><div id="frameNq23uG_left" class="column frame-1-c"><div id="frameNq23uG_left_temp" class="move-span temp"></div><div id="portal_block_202" class="cl_block_bm block move-span"><div id="portal_block_202_content" class="dxb_bc">
+
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+
+</div></div><div id="portal_block_195" class="cl_block_bm block move-span"><div id="portal_block_195_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+<div class="comiis_dfmh_border comiis_dfmh_w471r">
+<div class="comiis_dfmh_titone comiis_dfmh_Purplepowder">
+<h2><pw-title><em>婚姻</em>课堂</pw-title></h2>
+<span><pw-title><a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a>|<a href="#" target="_blank">自定内容</a></pw-title></span>
+</div>
+<div class="comiis_dfmh_w450">
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh20" class="area"><div id="frameO5GCQ7" class="cl_frame_bm frame move-span cl frame-1"><div id="frameO5GCQ7_left" class="column frame-1-c"><div id="frameO5GCQ7_left_temp" class="move-span temp"></div><div id="portal_block_203" class="cl_block_bm block move-span"><div id="portal_block_203_content" class="dxb_bc">
+
+
+<pw-list><for:>
+<div class="comiis_dfmh_imgfonts">
+<div class="comiis_dfmh_imgl"><a href="{url}" title="{title}" target="_blank"><img src="{thumb|165|175}" width="156" height="85" alt="{title}" /></a></div>
+<div class="comiis_dfmh_rfonts">
+<h3><a href="{url}" title="{title}" target="_blank">{title}</a></h3>
+<p>{intro}<a href="{url}" target="_blank">[详细]</a></p>
+</div>
+</div></for></pw-list>
+
+</div></div><div id="portal_block_196" class="cl_block_bm block move-span"><div id="portal_block_196_content" class="dxb_bc"><div class="clearfix comiis_dfmh_itemstwo">
+<ul>
+
+
+<pw-list><for:><li><code>{author}</code><span><a href="{forumUrl}" target="_blank">[{forum}]</a></span><a href="{url}" title="{title}" target="_blank">{title}</a></li></for></pw-list>
+
+
+
+</ul></div>
+</div></div></div></div></div><!--[/diy]-->
+</div>
+</div>
+</div>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh21" class="area"><div id="frameW552Si" class="cl_frame_bm frame move-span cl frame-1"><div id="frameW552Si_left" class="column frame-1-c"><div id="frameW552Si_left_temp" class="move-span temp"></div><div id="portal_block_185" class="cl_block_bm block move-span"><div id="portal_block_185_content" class="dxb_bc"><div class="portal_block_summary"><div class="comiis_dfmh_bananer"><pw-list><a href="#" target="_blank"><img src="{@G:design.url.images}/dfmh_ad12.jpg"></a></pw-list></div></div></div></div></div></div></div><!--[/diy]-->
+<div class="comiis_dfmh_bananer">
+<div class="comiis_dfmh_titone comiis_dfmh_gray">
+<h2><pw-title><em>便民</em>电话</pw-title></h2>
+<span style="padding-right:8px;"><pw-title>欢迎加入以下未登记的位置:30元/月,变色50/月,先占先得!可新增行业类别 登记电话:123456789 QQ:888888</pw-title></span>
+</div>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh22" class="area"><div id="framehXCsMp" class="cl_frame_bm frame move-span cl frame-1"><div id="framehXCsMp_left" class="column frame-1-c"><div id="framehXCsMp_left_temp" class="move-span temp"></div><div id="portal_block_204" class="cl_block_bm block move-span"><div id="portal_block_204_content" class="dxb_bc"><div class="portal_block_summary"><ul class="clearfix comiis_labels"><pw-list>
+<li><FONT color="#000000">扣扣设计:12345</FONT> </li>
+<li><FONT color="#000000">质量举报:12365</FONT> </li>
+<li><FONT color="#000000">消费投诉:12315</FONT> </li>
+<li><FONT color="#000000">物价投诉:12358</FONT> </li>
+<li><FONT color="#000000">环保投诉:12369</FONT> </li>
+<li><FONT color="#000000">供电抢修:95598</FONT> </li>
+<li><FONT color="#777777">酒店宾馆:未登记</FONT> </li>
+<li><FONT color="#777777">电脑维修:未登记</FONT> </li>
+<li><FONT color="#777777">婚纱摄影:未登记</FONT> </li>
+<li><FONT color="#777777">今日房产:未登记</FONT> </li>
+<li><FONT color="#777777">汽车租赁:未登记</FONT> </li>
+<li><FONT color="#777777">城市药店:未登记</FONT> </li>
+<li><FONT color="#777777">城市石材:未登记</FONT> </li>
+<li><FONT color="#777777">水电装潢:未登记</FONT> </li>
+<li><FONT color="#dd0000">网站制作:123440</FONT> </li>
+<li><FONT color="#777777">法律服务:未登记</FONT> </li>
+<li><FONT color="#777777">晚报订阅:未登记</FONT> </li>
+<li><FONT color="#777777">基建零活:未登记</FONT> </li>
+<li><FONT color="#777777">家电回收:未登记</FONT> </li>
+<li><FONT color="#777777">家电维修:未登记</FONT> </li>
+<li><FONT color="#777777">婚庆庆典:未登记</FONT> </li>
+<li><FONT color="#777777">彩票预定:未登记</FONT> </li>
+<li><FONT color="#777777">烟花爆竹:未登记</FONT> </li>
+<li><FONT color="#777777">同城速递:未登记</FONT> </li>
+<li><FONT color="#777777">财险办理:未登记</FONT> </li>
+<li><FONT color="#777777">餐饮外卖:未登记</FONT> </li>
+<li><FONT color="#777777">快递服务:未登记</FONT> </li>
+<li><FONT color="#777777">物流货运:未登记</FONT> </li>
+<li><FONT color="#777777">商务彩印:未登记</FONT> </li>
+<li><FONT color="#777777">租房售房:未登记</FONT> </li>
+<li><FONT color="#777777">管道疏通:未登记</FONT> </li>
+<li><FONT color="#777777">婚嫁照相:未登记</FONT> </li>
+<li><FONT color="#777777">鲜花预定:未登记</FONT> </li>
+<li><FONT color="#777777">蛋糕预定:未登记</FONT> </li>
+<li><FONT color="#777777">搬家服务:未登记</FONT> </li>
+<li><FONT color="#777777">物流快递:未登记</FONT> </li></pw-list>
+</ul></div></div></div></div></div></div><!--[/diy]-->
+</div>
+<div class="comiis_dfmh_bananer yqlj">
+<div class="comiis_dfmh_titone comiis_dfmh_link">
+<h2><em>友情</em>链接</h2>
+<span>
+<a href="index.php?m=link&c=index&a=run" class="J_link_apply" style="color:#f60" >申请链接</a>
+</span>
+</div>
+<!--[版权所有：PHPwind微版本]--><div id="comiis_x3dfmh23" class="area"><div id="frameQSS0EC" class="cl_frame_bm frame move-span cl frame-1"><div id="frameQSS0EC_left" class="column frame-1-c"><div id="frameQSS0EC_left_temp" class="move-span temp"></div><div id="portal_block_205" class="cl_block_bm block move-span"><div id="portal_block_205_content" class="dxb_bc"><div class="portal_block_summary"><div class="bn lk"><ul class="m cl"><pw-title>
+
+<li class="cl">
+<div class="forumlogo"><a target="_blank" href="http://www.115la.cn"><img src="{@G:design.url.images}/logo.gif" alt="115啦站长网" width="88" height="31" border="0"></a></div>
+<div class="forumcontent"><h5><a target="_blank" href="http://www.115la.cn">115啦站长网</a></h5><p>115啦站长网，致力站长共赢发展！站长上网先上115啦！</p></div></li>
+</pw-title></ul>
+
+
+
+
+<ul class="x cl">
+<pw-list>
+<li><a target="_blank" href="http://www.115la.cn">115啦站长网</a></li>
+<li><a target="_blank" href="http://www.phpwind.net.cn">PHPwind微版本</a></li>
+<li><a target="_blank" href="http://www.windsns.com">WindSNS</a></li>
+</pw-list>
+</ul></div></div></div></div></div></div></div><!--[/diy]-->
+</div>
+
+
+
+			<div id="discuz_tips" style="display:none;"></div>
+<!--end -->
+
+		</div>
+	</div>
+	<pw-footer/>
+	</div>
+<script>
+Wind.use('jquery', 'global');
+</script>
+<script>
+Wind.ready('global.js', function(){
+	Wind.use('slides', function(){
+		$('#J_slides').slides({
+			preload: false,
+			preloadImage: '{@theme:images}/common/loading.gif',
+			play: 5000,
+			pause: 100,
+			hoverPause: true,
+			effect : 'slide', //渐隐切换fade, 默认为'slide'滚动
+			crossfade : true, //消去渐隐间隙空白
+			paginationClass : 'J_slides_num',
+			generatePagination : false,
+			animationStart: function(current){
+				$('.caption').animate({
+					bottom:-55
+				},100);
+			},
+			animationComplete: function(current){
+				$('.caption').animate({
+					bottom:0
+				},200);
+			},
+			slidesLoaded: function() {
+				$('.caption').animate({
+					bottom:0
+				},200);
+			}
+		});
+	})
+});
+</script>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"slide":{"type":"slide","bdImg":"8","bdPos":"right","bdTop":"61"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+<pw-end/>
+</body>
+</html>
+

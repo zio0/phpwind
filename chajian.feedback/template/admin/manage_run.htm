@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <template source='TPL:admin.common.head' />
+</head>
+
+<body>
+    <div class="wrap J_check_wrap">
+        <div class="nav">
+            <ul class="cc">
+                <li class="current"><a href="{@url:app/feedback/manage/run}">反馈管理</a></li>
+            </ul>
+        </div>
+        <form class="J_ajaxForm" action="{@url:app/feedback/manage/run}" method="post">
+            <div class="table_list">
+                <table width="100%">
+                    <thead>
+                        <tr>
+                            <td><label><input type="checkbox" name="checkAll" class="checkbox J_check_all" data-direction="y" data-checklist="J_check_y">全选</label></td>
+                            <td>反馈ID</td>
+                            <td>反馈标题</td>
+                            <td>反馈内容</td>
+                            <td>电话</td>
+                            <td>反馈时间</td>
+                            <td>操作</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--# foreach ($list as $feedback) { #-->
+                        <tr>
+                            <td><input type="checkbox" name="fid[]" class="checkbox J_check" value="{$feedback['fid']}" data-xid="J_check_x" data-yid="J_check_y"></td>
+                            <td>{$feedback['fid']}</td>
+                            <td>{$feedback['name']}</td>
+                            <td>{$feedback['content']}</td>
+                            <td>{$feedback['usertel']}</td>
+                            <td>{@Pw::time2str($feedback['created_time'])}</td>
+                            <td>
+                                <a href="{@url:app/feedback/manage/doDelete}" class="mr10 J_ajax_del" data-pdata="{'fid': '{$feedback['fid']}'}">[删除]</a>
+                            </td>
+                        </tr>
+                        <!--# } #-->
+                    </tbody>
+                </table>
+                <div class="p10">
+                    <page tpl='TPL:common.page' page='$page' count='$count' per='$perpage' url='app/feedback/manage/run' />
+                </div>
+            </div>
+            <div class="btn_wrap">
+                <label class="mr20"><input type="checkbox" name="checkAll" class="checkbox J_check_all" data-direction="y" data-checklist="J_check_y">全选</label>
+                <button class="btn btn-primary" id="J_feedback_del_all" type="submit">删除</button>
+            </div>
+        </form>
+    </div>
+    <template source='TPL:admin.common.footer' />
+    <script type="text/javascript">
+        Wind.use('dialog', function() {
+            $('#J_feedback_del_all').on('click', function(e) {
+                e.preventDefault();
+                if (!$('input.J_check:checked').length) {
+                    Wind.dialog.alert('请至少选定一条反馈意见');
+                    return;
+                }
+                Wind.dialog({
+                    message: '确定删除选定的反馈意见？',
+                    type: 'confirm',
+                    onOk: function() {
+                        $('form.J_ajaxForm').ajaxSubmit({
+                            dataType: 'json',
+                            url: '{@url:app/feedback/manage/doBatchDelete}',
+                            success: function(data, statusText, xhr, $form) {
+                                if (data.state === 'success') {
+                                    var location = window.location;
+                                    location.href = location.pathname + location.search;
+                                } else {
+                                    Wind.dialog.alert(data.message);
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
